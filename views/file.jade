@@ -1,0 +1,23 @@
+//
+   Created by Yc on 2016/5/27.
+
+h1=dirname
+table.table.table-striped
+    thead
+        tr
+            td 类型
+            td 文件名
+            td 修改时间
+            td 大小
+    tbody
+        each obj in files
+         tr
+            td= obj.type
+            td
+              a(href=dirname+'/'+obj.name)
+                = obj.name
+            td= obj.time
+            td= obj.size
+
+footer
+p.text-center.text-info Running on node with Express, Jade.
