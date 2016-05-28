@@ -65,7 +65,12 @@ function loadFile(file,rela,raw,res){
                 title:filename,
                 src:filename+'?raw=true'
             })
-        }else{
+        }else if(filename.match(/\.(mp3|wma|aac)$/i)){
+            res.render('audio',{
+                title:filename,
+                src:filename+'?raw=true'
+            })
+        }else {
             fs.createReadStream(file).pipe(res);
         }
     }else{
