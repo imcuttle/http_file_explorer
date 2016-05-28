@@ -1,12 +1,13 @@
 //
    Created by Yc on 2016/5/27.
 
-h1=dirname
+h1=dirname===''?'/':dirname
 table.table.table-striped
     thead
         tr
             td 类型
             td 文件名
+            td 操作
             td 修改时间
             td 大小
     tbody
@@ -14,10 +15,13 @@ table.table.table-striped
          tr
             td= obj.type
             td
-              a(href=dirname+'/'+obj.name)
-                = obj.name
+                a(href=dirname+'/'+obj.name)= obj.name
+            td
+                a(href=dirname+'/'+obj.name+'?compress=true') 压缩下载
+                -if(obj.type==='文件')
+                    a(href=dirname+'/'+obj.name+'?raw=true',download=obj.name) 下载
             td= obj.time
             td= obj.size
 
 footer
-p.text-center.text-info Running on node with Express, Jade.
+    p.text-center.text-info Running on node with Express, Jade. By Moyu.

@@ -4,6 +4,7 @@ body {
 }
 
 a {
+  margin-right:10px;
   color: #00B7FF;
 }
 .text-center{
@@ -11,4 +12,7 @@ a {
 }
 .text-info{
   color: #00B7FF;
+}
+footer{
+  margin-top:80px;
 }
