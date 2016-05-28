@@ -1,4 +1,4 @@
-
+﻿
 /*
  * GET home page.
  */
@@ -55,7 +55,7 @@ function loadDir(root,rela,req,res) {
 function loadFile(file,rela,raw,res){
     if(!raw){
         var filename = rela.substring(rela.lastIndexOf('/')+1);
-        if(filename.match(/\.(avi|mp4|mkv|rmvb|rm|wma)$/i)){
+        if(filename.match(/\.(avi|mp4|mkv|rmvb|mpg|rm|wma)$/i)){
             res.render('video',{
                 title:filename,
                 src:filename+'?raw=true'
