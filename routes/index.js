@@ -54,8 +54,15 @@ function loadDir(r,rela,req,res) {
             }
         }
         console.log('o',o);
-        Promise.all(files.map((x,i,a)=>{return statPr(r,x);}))
-            .then(function (values) {
+        Q.allSettled(files.map((x,i,a)=>{return statPr(r,x);}))
+            .then(function (results) {
+		var values=[];
+		results.forEach(x=>{
+		    if(x.state==='fulfilled'){
+			values.push(x.value);
+		    }else
+			console.error(x.reason);
+		});
                 res.render('file',Object.extend(o,
                     {
                         title:'HTTP文件查看',
@@ -70,9 +77,7 @@ function loadDir(r,rela,req,res) {
                         })
                     })
                 );
-            }).catch(function (err) {
-                console.error(err);
-            });
+            },console.error)
     }
   });
 }
