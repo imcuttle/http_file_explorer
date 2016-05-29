@@ -2,4 +2,10 @@
    Created by Yc on 2016/5/29.
 
 -var d = dirname.substring(0,dirname.lastIndexOf('/'))
-p:   a(href=d===''?'/':d) 上一层
+p
+    if(dirname!=='')
+        a(href=d===''?'/':d) 上一层
+    -if(prev)
+        a(href=d+'/'+prev style="margin-left:20px;")<< #{prev}
+    -if(next)
+        a(href=d+'/'+next,style="margin-left:20px;")=next+" >>"

@@ -30,48 +30,105 @@ var statPr = function (root,file) {
   });
   return deferred.promise;
 };
-function loadDir(root,rela,req,res) {
-  fs.readdir(root,function (err,files) {
+
+
+function loadDir(r,rela,req,res) {
+  fs.readdir(r,function (err,files) {
     if(err) throw err;
-    Promise.all(files.map(x=>{return statPr(root,x);}))
-        .then(function (values) {
-          res.render('file',
-              {
-                title:'HTTP文件查看',
-                dirname:rela,
-                files : values.map(x=> {
-                  return {
-                    type: x.type,
-                    name: x.name,
-                    time: x.mtime.format(),
-                    size: x.size+' 字节'
-                  };
-                })
-              }
-          );
-        });
+    if(r!==root){
+        var d = r.substring(0,r.lastIndexOf('/'));
+        Q.nfcall(fs.readdir,d)
+            .then(function (list) {
+                fn(list,r.substring(r.lastIndexOf('/')+1));
+            })
+    }else {
+        fn();
+    }
+    function fn(list,f) {
+        var o ={};
+        if(list){
+            var i = list.indexOf(f);
+            if(i>=0) {
+                o.prev = list[i - 1];
+                o.next = list[i + 1];
+            }
+        }
+        console.log('o',o);
+        Promise.all(files.map((x,i,a)=>{return statPr(r,x);}))
+            .then(function (values) {
+                res.render('file',Object.extend(o,
+                    {
+                        title:'HTTP文件查看',
+                        dirname:rela,
+                        files : values.map(x=> {
+                            return {
+                                type: x.type,
+                                name: x.name,
+                                time: x.mtime.format(),
+                                size: x.size.toSize()
+                            };
+                        })
+                    })
+                );
+            }).catch(function (err) {
+                console.error(err);
+            });
+    }
   });
+}
+Number.prototype.toSize = function () {
+    if(this<1024){
+        return this+"B";
+    }else if(this<1024<<10){
+        return (this/1024).toFixed(2)+"KB";
+    }else if(this<1024<<20){
+        return (this/(1024<<10)).toFixed(2)+"MB";
+    }else{
+        return (this/(1024<<20)).toFixed(2)+"GB";
+    }
+}
+Object.extend = function (src) {
+    Array.prototype.slice.call(arguments,1)
+        .forEach(x=>{
+            for(var k in x)
+                src[k]=x[k];
+        })
+    return src;
 }
 function loadFile(file,rela,raw,res){
     if(!raw){
-        var filename = rela.substring(rela.lastIndexOf('/')+1);
-        if(filename.match(/\.(avi|mp4|mkv|rmvb|mpg|rm|wma)$/i)){
-            res.render('video',{
-                title:filename,
-                src:filename+'?raw=true'
-            })
-        }else if(filename.match(/\.(jpg|png|bmp|jepg|gif)$/i)){
-            res.render('img',{
-                title:filename,
-                src:filename+'?raw=true'
-            })
-        }else if(filename.match(/\.(mp3|wma|aac)$/i)){
-            res.render('audio',{
-                title:filename,
-                src:filename+'?raw=true'
-            })
-        }else {
-            fs.createReadStream(file).pipe(res);
+        if(file!==root){
+            var d = file.substring(0,file.lastIndexOf('/'));
+            Q.nfcall(fs.readdir,d)
+                .then(function (list) {
+                    fn(list,file.substring(file.lastIndexOf('/')+1));
+                }).catch(function (err) {
+                    console.error(err);
+                })
+        }else fn();
+        function fn(list,f) {
+            var o ={};
+            if(list){
+                var i = list.indexOf(f);
+                if(i>=0) {
+                    o.prev = list[i - 1];
+                    o.next = list[i + 1];
+                }
+            }
+            o = Object.extend(o,{
+                dirname:rela,
+                title:f,
+                src:f+'?raw=true'
+            });
+            if(f.match(/\.(avi|mp4|mkv|rmvb|mpg|rm|wma)$/i)){
+                res.render('video',o);
+            }else if(f.match(/\.(jpg|png|bmp|jepg|gif)$/i)){
+                res.render('img',o);
+            }else if(f.match(/\.(mp3|wma|aac)$/i)){
+                res.render('audio',o);
+            }else {
+                fs.createReadStream(file).pipe(res);
+            }
         }
     }else{
         fs.createReadStream(file).pipe(res);
