@@ -3,7 +3,6 @@
  * GET home page.
  */
 var fs = require('fs');
-var Q = require('q');
 var url = require('url');
 var archiver = require('archiver');
 
@@ -30,6 +29,24 @@ var statPr = function (root,file) {
   });
   return deferred.promise;
 };
+var statP = function(root,file){
+	return new Promise(function(resolve){
+	  fs.stat(root+'/'+file,function (err, stats) {
+		var t = {};
+		if(err){
+			t.reason=err;
+			resolve(t);
+		}
+		else {
+		   t.state='ok';
+	       stats.name = file;
+	       stats.type = stats.isDirectory()?'文件夹':'文件';
+		   t.value=stats;
+	       resolve(t);
+	    }
+	  });
+	})
+}
 
 
 function loadDir(r,rela,req,res) {
@@ -37,7 +54,7 @@ function loadDir(r,rela,req,res) {
     if(err) throw err;
     if(r!==root){
         var d = r.substring(0,r.lastIndexOf('/'));
-        Q.nfcall(fs.readdir,d)
+        Promise.resolve(d).then(fs.readdir)
             .then(function (list) {
                 fn(list,r.substring(r.lastIndexOf('/')+1));
             })
@@ -54,15 +71,15 @@ function loadDir(r,rela,req,res) {
             }
         }
         console.log('o',o);
-        Q.allSettled(files.map((x,i,a)=>{return statPr(r,x);}))
+        Promise.all(files.map((x,i,a)=>{return statP(r,x);}))
             .then(function (results) {
-		var values=[];
-		results.forEach(x=>{
-		    if(x.state==='fulfilled'){
-			values.push(x.value);
-		    }else
-			console.error(x.reason);
-		});
+				var values=[];
+				results.forEach(x=>{
+					if(x.state==='ok'){
+						values.push(x.value);
+					}else
+						console.error(x.reason);
+				});
                 res.render('file',Object.extend(o,
                     {
                         title:'HTTP文件查看',
@@ -104,7 +121,7 @@ function loadFile(file,rela,raw,res){
     if(!raw){
         if(file!==root){
             var d = file.substring(0,file.lastIndexOf('/'));
-            Q.nfcall(fs.readdir,d)
+            Promise.resolve(d).then(fs.readdir)
                 .then(function (list) {
                     fn(list,file.substring(file.lastIndexOf('/')+1));
                 }).catch(function (err) {
