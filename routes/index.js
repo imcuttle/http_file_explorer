@@ -122,7 +122,7 @@ function loadFile(file,rela,raw,res){
             });
             if(f.match(/\.(avi|mp4|mkv|rmvb|mpg|rm|wma)$/i)){
                 res.render('video',o);
-            }else if(f.match(/\.(jpg|png|bmp|jepg|gif)$/i)){
+            }else if(f.match(/\.(jpg|png|bmp|jpeg|gif)$/i)){
                 res.render('img',o);
             }else if(f.match(/\.(mp3|wma|aac)$/i)){
                 res.render('audio',o);
