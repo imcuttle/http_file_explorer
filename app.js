@@ -30,8 +30,12 @@ app.configure('production', function(){
   app.use(express.errorHandler());
 });
 
+var fs = require('fs');
 // Routes
-
+global.root = fs.readFileSync('root').toString().split(/\s+/)[0];
+fs.watch('root',function () {
+  global.root = fs.readFileSync('root').toString().split(/\s+/)[0];
+});
 app.get('/*', routes.index);
 
 

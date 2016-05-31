@@ -157,10 +157,11 @@ function loadFile(file,rela,raw,res){
     }
 
 }
-var root = fs.readFileSync('./root').toString();
+
 exports.index = function(req, res){
     var arg = url.parse(req.url,true),
         query = arg.query;
+    var root = global.root;
     var r = decodeURIComponent(arg.pathname);
     r=r==='/'?'':r;
     console.info(r,query);
