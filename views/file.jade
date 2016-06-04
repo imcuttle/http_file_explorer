@@ -18,9 +18,10 @@ table.table.table-striped
             td
                 a(href=dirname+'/'+obj.name)= obj.name
             td
-                a(href=dirname+'/'+obj.name+'?compress=true') 压缩下载
-                -if(obj.type==='文件')
-                    a(href=dirname+'/'+obj.name+'?raw=true',download=obj.name) 下载
+             -if(obj.type!=='文件')
+                a(href=dirname+'/'+obj.name+'/?compress=true',download=obj.name+'.zip') 压缩下载
+            //    -if(obj.type==='文件')
+            //        a(href=dirname+'/'+obj.name+'?raw=true',download=obj.name) 下载
             td= obj.time
             td= obj.size
 

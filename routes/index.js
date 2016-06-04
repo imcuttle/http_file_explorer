@@ -9,6 +9,7 @@ var archiver = require('archiver');
 function loadZip(file,rela,req,res) {
     var state = fs.statSync(file);
     var filename = rela.substring(rela.lastIndexOf('/')+1);
+    console.log('zip',filename)
     var archive = archiver('zip');
     archive.on('error', function(err){throw err;});
     archive.pipe(res);
@@ -54,9 +55,11 @@ function loadDir(r,rela,req,res) {
     if(err) throw err;
     if(r!==root){
         var d = r.substring(0,r.lastIndexOf('/'));
-        Promise.resolve(d).then(fs.readdir)
-            .then(function (list) {
-                fn(list,r.substring(r.lastIndexOf('/')+1));
+        Promise.resolve(d).then(v=>{
+                fs.readdir(v,function (err, files) {
+                    if(err) throw err;
+                    fn(files,r.substring(r.lastIndexOf('/')+1));
+                })
             })
     }else {
         fn();
@@ -169,15 +172,17 @@ exports.index = function(req, res){
     var root = global.root;
     var r = decodeURIComponent(arg.pathname);
     r=r==='/'?'':r;
-    console.info(r,query);
+
+    var t = r.replace(/(\/$)/g,'');
+    console.info(r,t,query);
     if(!query.compress){
         var state = fs.statSync(root+r);
         if(state.isDirectory())
-            loadDir(root+r,r, req, res);
+            loadDir(root+t,t, req, res);
         else
-            loadFile(root+r,r,query.raw,res);
+            loadFile(root+t,t,query.raw,res);
     }else{
-        loadZip(root+r,r,req,res);
+        loadZip(root+t,t,req,res);
     }
 };
 
