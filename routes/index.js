@@ -54,10 +54,11 @@ function loadDir(r,rela,req,res) {
     if(err) throw err;
     if(r!==root){
         var d = r.substring(0,r.lastIndexOf('/'));
-        Promise.resolve(d).then(fs.readdir)
-            .then(function (list) {
-                fn(list,r.substring(r.lastIndexOf('/')+1));
-            })
+        Promise.resolve(d).then(v=> {
+            fs.readdir(v, function (err, list) {
+                fn(list, r.substring(r.lastIndexOf('/') + 1))
+            });
+        })
     }else {
         fn();
     }
@@ -121,9 +122,10 @@ function loadFile(file,rela,raw,res){
     if(!raw){
         if(file!==root){
             var d = file.substring(0,file.lastIndexOf('/'));
-            Promise.resolve(d).then(fs.readdir)
-                .then(function (list) {
-                    fn(list,file.substring(file.lastIndexOf('/')+1));
+            Promise.resolve(d).then(v=>{
+                    fs.readdir(v,function (err, list) {
+                        fn(list,file.substring(file.lastIndexOf('/')+1))
+                    })
                 }).catch(function (err) {
                     console.error(err);
                 })
@@ -164,6 +166,7 @@ exports.index = function(req, res){
     var root = global.root;
     var r = decodeURIComponent(arg.pathname);
     r=r==='/'?'':r;
+
     console.info(r,query);
     if(!query.compress){
         var state = fs.statSync(root+r);
