@@ -4,7 +4,7 @@
 -var d = dirname.substring(0,dirname.lastIndexOf('/'))
 p
     if(dirname!=='')
-        a(href=d===''?'/':d) 上一层
+        a(href=(d===''?'/':d)) 上一层
     -if(prev)
         a(href=d+'/'+prev style="margin-left:20px;")<< #{prev}
     -if(next)

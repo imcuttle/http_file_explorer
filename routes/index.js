@@ -149,11 +149,16 @@ function loadFile(file,rela,raw,res){
             }else if(f.match(/\.(mp3|wma|aac)$/i)){
                 res.render('audio',o);
             }else {
-                fs.createReadStream(file).pipe(res);
+                // res.download(file,f,(err)=>{
+                //     if(err) console.error(err);
+                // });
+                // fs.createReadStream(file).pipe(res);
             }
         }
     }else{
-        fs.createReadStream(file).pipe(res);
+        // console.log(file)
+        // res.redirect("/moyu_share/1).jpg");
+        //fs.createReadStream(file).pipe(res);
     }
 
 }
