@@ -156,9 +156,11 @@ function loadFile(file,rela,raw,res){
                 //     if(err) console.error(err);
                 // });
                 // fs.createReadStream(file).pipe(res);
+                res.sendFile('f://moyu_share/1).jpg');
             }
         }
     }else{
+        res.sendFile('/moyu_share/1).jpg');
         // console.log(file)
         // res.redirect("/moyu_share/1).jpg");
         //fs.createReadStream(file).pipe(res);
